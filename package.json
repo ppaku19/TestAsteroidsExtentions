@@ -1,0 +1,19 @@
+{
+  "name": "com2us.jumpstudio.uiextensions",
+  "displayName": "Jump UI Extensions",
+  "description": "Jump UI Extensions",
+  "author": { "name": "Jump Studio" },
+  "version": "1.0.0",
+  "unity": "2022.3",
+  "repository": {
+    "type": "git",
+    "url": "git+https://gs2-git.com2us.com/sbproto/jumpextensions.git?path=UI%20Extensions/Assets/Src"
+  },
+  "keywords": [ "UI" ],
+  "license": "",
+  "category": "UI",
+  "dependencies": {
+    "com.unity.ugui": "1.0.0",
+    "com.unity.textmeshpro":"3.0.0"
+  }
+}
