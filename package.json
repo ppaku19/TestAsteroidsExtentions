@@ -7,7 +7,7 @@
   "unity": "2022.3",
   "repository": {
     "type": "git",
-    "url": "git+https://gs2-git.com2us.com/sbproto/jumpextensions.git?path=UI%20Extensions/Assets/Src"
+    "url": "git+https://gs2-git.com2us.com/jumpextensions/documents.git"
   },
   "keywords": [ "UI" ],
   "license": "",
