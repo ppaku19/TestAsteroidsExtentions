@@ -26,7 +26,13 @@ namespace TMPro
                 UpdateMaterial();
             }
         }
-        
+
+        [Header("Face")]
+        [Range(-100, 100)] [SerializeField] private sbyte m_FaceDilate = 0;
+        public sbyte faceDilate { get => m_FaceDilate; set { if (m_FaceDilate != value) { m_FaceDilate = value; UpdateMaterial(); } } }
+        [Range(0, 100)] [SerializeField] private byte m_FaceSoftness = 0;
+        public byte faceSoftness { get => m_FaceSoftness; set { if (m_FaceSoftness != value) { m_FaceSoftness = value; UpdateMaterial(); } } }
+
         [Header("Outline")]
         [SerializeField] private bool m_Outline = false;
         public bool outline { get => m_Outline; set { if (m_Outline != value) { m_Outline = value; UpdateMaterial(); } } }
@@ -34,8 +40,6 @@ namespace TMPro
         public Color outlineColor { get => m_OutlineColor; set { if (m_OutlineColor != value) { m_OutlineColor = value; UpdateMaterial(); } } }
         [Range(0, 100)] [SerializeField] private byte m_OutlineWidth = 0;
         public byte outlineWidth { get => m_OutlineWidth; set { if (m_OutlineWidth != value) { m_OutlineWidth = value; UpdateMaterial(); } } }
-        [Range(0, 100)] [SerializeField] private byte m_OutlineSoftness = 0;
-        public byte outlineSoftness { get => m_OutlineSoftness; set { if (m_OutlineSoftness != value) { m_OutlineSoftness = value; UpdateMaterial(); } } }
         
         [Header("Underlay")]
         [SerializeField] private bool m_Underlay = false;
@@ -113,11 +117,13 @@ namespace TMPro
             var materialData = new MaterialData()
             {
                 isValid = true,
+
+                faceDilate = faceDilate,
+                faceSoftness = faceSoftness,
                 
                 outline = outline,
                 outlineColor = outline ? outlineColor : new Color32(0, 0, 0, 255),
                 outlineWidth = outline ? outlineWidth : (byte)0,
-                outlineSoftness = outline ? outlineSoftness : (byte)0,
                 
                 underlay = underlay,
                 underlayColor = underlay ? underlayColor : new Color32(0, 0, 0, 255),
@@ -164,11 +170,14 @@ namespace TMPro
         public struct MaterialData : IEquatable<MaterialData>
         {
             public bool isValid;
-            
+
+            public sbyte faceDilate;
+            public byte faceSoftness;
+
             public bool outline;
             public Color32 outlineColor;
             public byte outlineWidth;
-            public byte outlineSoftness;
+            //public byte outlineSoftness;
             
             public bool underlay;
             public Color32 underlayColor;
@@ -180,10 +189,11 @@ namespace TMPro
             public bool Equals(MaterialData other)
             {
                 if (isValid != other.isValid) return false;
+                if (faceDilate != other.faceDilate) return false;
+                if (faceSoftness != other.faceSoftness) return false;
                 if (outline != other.outline) return false;
                 if (outlineColor.Equals(other.outlineColor) == false) return false;
                 if (outlineWidth != other.outlineWidth) return false;
-                if (outlineSoftness != other.outlineSoftness) return false;
                 if (underlay != other.underlay) return false;
                 if (underlayColor.Equals(other.underlayColor) == false) return false;
                 if (underlayOffsetX != other.underlayOffsetX) return false;
@@ -204,13 +214,14 @@ namespace TMPro
 
         private static void SetMaterialParameters(Material mat, MaterialData data)
         {
+            mat.SetFloat("_FaceDilate", data.faceDilate * 0.01f);
+            mat.SetFloat("_OutlineSoftness", data.faceSoftness * 0.01f);
             if (data.outline) mat.EnableKeyword("OUTLINE_ON");
             else mat.DisableKeyword("OUTLINE_ON");
             if (data.outline == true)
             {
                 mat.SetColor("_OutlineColor", data.outlineColor);
                 mat.SetFloat("_OutlineWidth", data.outlineWidth * 0.01f);
-                mat.SetFloat("_OutlineSoftness", data.outlineSoftness * 0.01f);
             }
             if (data.underlay) mat.EnableKeyword("UNDERLAY_ON");
             else mat.DisableKeyword("UNDERLAY_ON");
