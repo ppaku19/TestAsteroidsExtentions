@@ -79,11 +79,13 @@ namespace UnityEngine.UI
             UpdateTargetCanvas();
         }
 
+#if UNITY_EDITOR
         protected override void OnValidate()
         {
             base.OnValidate();
             UpdateSortingOrder();
         }
+#endif
 
 
         private void UpdateTargetCanvas()
