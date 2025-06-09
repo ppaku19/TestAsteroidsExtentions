@@ -27,6 +27,13 @@ namespace PowerfulUI
         [System.Serializable] public class ValueChangedEvent : UnityEvent<bool> { }
         [FormerlySerializedAs("onValueChanged")] [SerializeField] private ValueChangedEvent m_OnValueChanged = new ValueChangedEvent();
         public ValueChangedEvent onValueChanged { get => m_OnValueChanged; set => m_OnValueChanged = value; }
+        [FormerlySerializedAs("onValueOn")] [SerializeField] private UnityEvent m_OnValueOn = new UnityEvent();
+        public UnityEvent onValueOn { get => m_OnValueOn; set => m_OnValueOn = value; }
+        [FormerlySerializedAs("onValueOff")] [SerializeField] private UnityEvent m_OnValueOff = new UnityEvent();
+        public UnityEvent onValueOff { get => m_OnValueOff; set => m_OnValueOff = value; }
+
+        [SerializeField] private bool m_NotifyEventOnStart = false;
+        public bool notifyEventOnStart { get => m_NotifyEventOnStart; set => m_NotifyEventOnStart = value; }
 
 
         private Graphic[] m_OnGraphics;
@@ -58,6 +65,13 @@ namespace PowerfulUI
         protected override void Start()
         {
             PlayEffect(true);
+            if (notifyEventOnStart == true)
+            {
+                UISystemProfilerApi.AddMarker("Powerful.Tab.value", this);
+                onValueChanged.Invoke(m_IsOn);
+                if (m_IsOn) onValueOn.Invoke();
+                else onValueOff.Invoke();
+            }
         }
 
         public void SetIsOnWithoutNotify(bool value)
@@ -77,6 +91,8 @@ namespace PowerfulUI
             {
                 UISystemProfilerApi.AddMarker("Powerful.Tab.value", this);
                 onValueChanged.Invoke(m_IsOn);
+                if (m_IsOn) onValueOn.Invoke();
+                else onValueOff.Invoke();
             }
         }
 

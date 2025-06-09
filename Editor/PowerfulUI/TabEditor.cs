@@ -49,6 +49,9 @@ namespace PowerfulUI
                 }
             }
             EditorGUILayout.PropertyField(serializedObject.FindProperty("m_OnValueChanged"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("m_OnValueOn"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("m_OnValueOff"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("m_NotifyEventOnStart"));
             serializedObject.ApplyModifiedProperties();
         }
     }
