@@ -35,6 +35,10 @@ namespace PowerfulUI
         protected SerializedProperty m_PowerfulUI_OnClickProperty;
         protected SerializedProperty m_PowerfulUI_EnableLongPressProperty;
 
+        // Whenever adding new SerializedProperties to the Selectable and SelectableEditor
+        // Also update this guy in OnEnable. This makes the inherited classes from Selectable not require a CustomEditor.
+        protected List<string> m_PropertyPathToExcludeForChildClasses = new List<string>();
+
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -60,6 +64,21 @@ namespace PowerfulUI
             
             m_PowerfulUI_OnClickProperty = serializedObject.FindProperty("m_OnClick");
             m_PowerfulUI_EnableLongPressProperty = serializedObject.FindProperty("m_EnableLongPress");
+
+            m_PropertyPathToExcludeForChildClasses.Add(m_PowerfulUI_ScriptProperty.propertyPath);
+            m_PropertyPathToExcludeForChildClasses.Add(m_PowerfulUI_InteractableProperty.propertyPath);
+            m_PropertyPathToExcludeForChildClasses.Add(m_PowerfulUI_TargetGraphicProperty.propertyPath);
+            m_PropertyPathToExcludeForChildClasses.Add(m_PowerfulUI_TransitionProperty.propertyPath);
+            m_PropertyPathToExcludeForChildClasses.Add(m_PowerfulUI_ColorBlockProperty.propertyPath);
+            m_PropertyPathToExcludeForChildClasses.Add(m_PowerfulUI_SpriteStateProperty.propertyPath);
+            m_PropertyPathToExcludeForChildClasses.Add(m_PowerfulUI_AnimTriggerProperty.propertyPath);
+            m_PropertyPathToExcludeForChildClasses.Add(m_PowerfulUI_NavigationProperty.propertyPath);
+            m_PropertyPathToExcludeForChildClasses.Add(m_PowerfulUI_OnClickProperty.propertyPath);
+            m_PropertyPathToExcludeForChildClasses.Add(m_PowerfulUI_EnableLongPressProperty.propertyPath);
+            m_PropertyPathToExcludeForChildClasses.Add(serializedObject.FindProperty("m_OnSubmitToClick").propertyPath);
+            m_PropertyPathToExcludeForChildClasses.Add(serializedObject.FindProperty("m_EnableEventOnDisabled").propertyPath);
+            m_PropertyPathToExcludeForChildClasses.Add(serializedObject.FindProperty("m_OnBeginLongPress").propertyPath);
+            m_PropertyPathToExcludeForChildClasses.Add(serializedObject.FindProperty("m_OnEndLongPress").propertyPath);
         }
 
         public override void OnInspectorGUI()
@@ -104,7 +123,9 @@ namespace PowerfulUI
                 }
                 EditorGUI.indentLevel --;
             }
-            
+
+            ChildClassPropertiesGUI();
+
             serializedObject.ApplyModifiedProperties();
         }
 
@@ -200,6 +221,18 @@ namespace PowerfulUI
                 EditorPrefs.SetBool("SelectableEditor.ShowNavigation", showNavigation);
                 SceneView.RepaintAll();
             }
+        }
+
+
+        // Draw the extra SerializedProperties of the child class.
+        // We need to make sure that m_PropertyPathToExcludeForChildClasses has all the Selectable properties and in the correct order.
+        // TODO: find a nicer way of doing this. (creating a InheritedEditor class that automagically does this)
+        protected void ChildClassPropertiesGUI()
+        {
+            if (GetType() != typeof(SelectableEditor))
+                return;
+
+            DrawPropertiesExcluding(serializedObject, m_PropertyPathToExcludeForChildClasses.ToArray());
         }
     }
 }

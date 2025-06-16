@@ -17,6 +17,16 @@ namespace PowerfulUI
             base.OnEnable();
             m_GroupProperty = serializedObject.FindProperty("m_Group");
             m_IsOnProperty = serializedObject.FindProperty("m_IsOn");
+
+            m_PropertyPathToExcludeForChildClasses.Add(m_GroupProperty.propertyPath);
+            m_PropertyPathToExcludeForChildClasses.Add(m_IsOnProperty.propertyPath);
+            m_PropertyPathToExcludeForChildClasses.Add(serializedObject.FindProperty("m_Index").propertyPath);
+            m_PropertyPathToExcludeForChildClasses.Add(serializedObject.FindProperty("m_Ons").propertyPath);
+            m_PropertyPathToExcludeForChildClasses.Add(serializedObject.FindProperty("m_Offs").propertyPath);
+            m_PropertyPathToExcludeForChildClasses.Add(serializedObject.FindProperty("m_OnValueChanged").propertyPath);
+            m_PropertyPathToExcludeForChildClasses.Add(serializedObject.FindProperty("m_OnValueOn").propertyPath);
+            m_PropertyPathToExcludeForChildClasses.Add(serializedObject.FindProperty("m_OnValueOff").propertyPath);
+            m_PropertyPathToExcludeForChildClasses.Add(serializedObject.FindProperty("m_NotifyEventOnStart").propertyPath);
         }
         
 
@@ -28,7 +38,7 @@ namespace PowerfulUI
             serializedObject.Update();
             EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Index"));
             EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Group"));
+            EditorGUILayout.PropertyField(m_GroupProperty);
             if (EditorGUI.EndChangeCheck())
             {
                 for (var i = 0; i < targets.Length; i ++)
@@ -52,6 +62,9 @@ namespace PowerfulUI
             EditorGUILayout.PropertyField(serializedObject.FindProperty("m_OnValueOn"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("m_OnValueOff"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("m_NotifyEventOnStart"));
+
+            ChildClassPropertiesGUI();
+
             serializedObject.ApplyModifiedProperties();
         }
     }
