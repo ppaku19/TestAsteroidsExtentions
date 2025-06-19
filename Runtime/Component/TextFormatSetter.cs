@@ -75,28 +75,58 @@ namespace UnityEngine.UI
 #if UNITY_EDITOR
             if (Application.isPlaying == false)
             {
-                if (string.IsNullOrWhiteSpace(m_TestParam3) == false)
-                    str = string.Format(format, m_TestParam1, m_TestParam2, m_TestParam3);
-                else if (string.IsNullOrWhiteSpace(m_TestParam2) == false)
-                    str = string.Format(format, m_TestParam1, m_TestParam2);
-                else if (string.IsNullOrWhiteSpace(m_TestParam1) == false)
-                    str = string.Format(format, m_TestParam1);
-                else
+                try
+                {
+                    if (string.IsNullOrWhiteSpace(m_TestParam3) == false)
+                        str = string.Format(format, m_TestParam1, m_TestParam2, m_TestParam3);
+                    else if (string.IsNullOrWhiteSpace(m_TestParam2) == false)
+                        str = string.Format(format, m_TestParam1, m_TestParam2);
+                    else if (string.IsNullOrWhiteSpace(m_TestParam1) == false)
+                        str = string.Format(format, m_TestParam1);
+                    else
+                        str = format;
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogException(e);
                     str = format;
+                }
             }
             else
 #endif
             {
                 if (_params != null)
                 {
-                    if (_params.Length >= 3)
-                        str = string.Format(format, _params[0], _params[1], _params[2]);
-                    else if (_params.Length >= 2)
-                        str = string.Format(format, _params[0], _params[1]);
-                    else if (_params.Length >= 1)
-                        str = string.Format(format, _params[0]);
+                    if (m_SafeFormat)
+                    {
+                        try
+                        {
+                            if (_params.Length >= 3)
+                                str = string.Format(format, _params[0], _params[1], _params[2]);
+                            else if (_params.Length >= 2)
+                                str = string.Format(format, _params[0], _params[1]);
+                            else if (_params.Length >= 1)
+                                str = string.Format(format, _params[0]);
+                            else
+                                str = format;
+                        }
+                        catch (System.Exception e)
+                        {
+                            Debug.LogException(e);
+                            str = format;
+                        }
+                    }
                     else
-                        str = format;
+                    {
+                        if (_params.Length >= 3)
+                            str = string.Format(format, _params[0], _params[1], _params[2]);
+                        else if (_params.Length >= 2)
+                            str = string.Format(format, _params[0], _params[1]);
+                        else if (_params.Length >= 1)
+                            str = string.Format(format, _params[0]);
+                        else
+                            str = format;
+                    }
                 }
                 else
                 {
@@ -104,28 +134,19 @@ namespace UnityEngine.UI
                 }
             }
 
-            if (m_SafeFormat)
-            {
-                try
-                {
-                    if (text != null) text.text = str;
-                    if (tmpText != null) tmpText.text = str;
-                }
-                catch (System.Exception e)
-                {
-                    Debug.LogException(e);
-                }
-            }
-            else
-            {
-                if (text != null) text.text = str;
-                if (tmpText != null) tmpText.text = str;
-            }
+            if (text != null) text.text = str;
+            if (tmpText != null) tmpText.text = str;
         }
 
         private void OnValidate()
         {
             UpdateText();
+        }
+
+        private void Reset()
+        {
+            if (text != null) m_Format = text.text;
+            else if (tmpText != null) m_Format = tmpText.text;
         }
     }
 
