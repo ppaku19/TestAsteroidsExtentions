@@ -6,7 +6,7 @@ namespace UnityEngine.UI
 {
     public class TextFormatSetter : MonoBehaviour
     {
-        [SerializeField] private string m_Format = "{0}";
+        [SerializeField] [TextArea] private string m_Format = "{0}";
         public string format
         {
             get => m_Format;
