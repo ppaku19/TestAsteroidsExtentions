@@ -8,21 +8,6 @@ namespace TMPro
     [ExecuteAlways]
     public class TextMaterialChanger : MonoBehaviour
     {
-        [Header("Material")]
-        [SerializeField] private Material m_OriginMaterial;
-        public Material originMaterial
-        {
-            get => m_OriginMaterial;
-            set
-            {
-                if (m_OriginMaterial == value)
-                    return;
-
-                m_OriginMaterial = value;
-                ResetMaterial();
-                UpdateMaterial();
-            }
-        }
         [SerializeField] private Material m_ChangeMaterial;
         public Material changeMaterial
         {
@@ -33,8 +18,8 @@ namespace TMPro
                     return;
 
                 m_ChangeMaterial = value;
-                ResetMaterial();
-                UpdateMaterial();
+                if (enabled == true)
+                    text.fontSharedMaterial = value;
             }
         }
 
@@ -52,58 +37,33 @@ namespace TMPro
             }
         }
 
-        private TMP_FontAsset m_PrevFontAsset;
 
         private void OnEnable()
         {
-            if (m_PrevFontAsset != text.font || originMaterial == null || text.fontMaterial == null)
-            {
-                ResetMaterial();
-                m_PrevFontAsset = text.font;
-                originMaterial = text.fontSharedMaterial;
-            }
+            if (changeMaterial != null)
+                text.fontSharedMaterial = changeMaterial;
 
-            UpdateMaterial();
+            text.OnPreRenderText += OnPreRenderText;
         }
 
         private void OnDisable()
         {
-            ResetMaterial();
-            m_PrevFontAsset = null;
+            text.OnPreRenderText -= OnPreRenderText;
         }
 
         private void OnValidate()
         {
-            UpdateMaterial();
+            if (enabled == true)
+                text.fontSharedMaterial = changeMaterial;
         }
 
-        private void OnTransformParentChanged()
-        {
-            if (text == null)
-                return;
-
-            text.fontSharedMaterial = m_OriginMaterial;
-            m_OriginMaterial = null;
-            ResetMaterial();
-            UpdateMaterial();
-        }
-
-
-        private void UpdateMaterial()
+        private void OnPreRenderText(TMP_TextInfo textInfo)
         {
             if (changeMaterial == null)
                 return;
 
-            text.fontMaterial = changeMaterial;
+            if (text.fontSharedMaterial != changeMaterial)
+                text.fontSharedMaterial = changeMaterial;
         }
-
-        private void ResetMaterial()
-        {
-            if (originMaterial == null)
-                return;
-
-            text.fontMaterial = originMaterial;
-        }
-
     }
 }
