@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
+using UnityEngine.Pool;
 
 namespace TMPro
 {
@@ -210,7 +210,7 @@ namespace TMPro
             public List<TextSimpleMaterialGenerator> usageList = new List<TextSimpleMaterialGenerator>();
         }
 
-        private static Dictionary<Material, Dictionary<MaterialData, CachedMaterialData>> s_Materials = new Dictionary<Material, Dictionary<MaterialData, CachedMaterialData>>();
+        private static Dictionary<int, Dictionary<MaterialData, CachedMaterialData>> s_Materials = new Dictionary<int, Dictionary<MaterialData, CachedMaterialData>>();
 
         private static void SetMaterialParameters(Material mat, MaterialData data)
         {
@@ -246,17 +246,18 @@ namespace TMPro
         {
             if (originMaterial == null)
                 return null;
+
+            var originMaterialInstanceID = originMaterial.GetInstanceID();
+            if (s_Materials.ContainsKey(originMaterialInstanceID) == false)
+                s_Materials.Add(originMaterialInstanceID, new Dictionary<MaterialData, CachedMaterialData>());
             
-            if (s_Materials.ContainsKey(originMaterial) == false)
-                s_Materials.Add(originMaterial, new Dictionary<MaterialData, CachedMaterialData>());
-            
-            if (s_Materials[originMaterial].ContainsKey(data) == false)
+            if (s_Materials[originMaterialInstanceID].ContainsKey(data) == false)
             {
                 var cachedData = new CachedMaterialData();
                 cachedData.material = GenerateMaterial(originMaterial, data);
-                s_Materials[originMaterial].Add(data, cachedData);
+                s_Materials[originMaterialInstanceID].Add(data, cachedData);
             }
-            return s_Materials[originMaterial][data];
+            return s_Materials[originMaterialInstanceID][data];
         }
 
         private static void ApplyMaterial(TextSimpleMaterialGenerator generator, Material originMaterial, MaterialData prevData, MaterialData nextData)
@@ -282,6 +283,38 @@ namespace TMPro
             {
                 generator.text.fontMaterial = originMaterial;
             }
+        }
+
+        public static void ClearUnusedMaterials()
+        {
+            var removedOriginMatInstIDList = ListPool<int>.Get();
+            foreach (var keypair in s_Materials)
+            {
+                var removedMatList = ListPool<MaterialData>.Get();
+                foreach (var keypair2 in keypair.Value)
+                {
+                    //사용처 체크
+                    //남은 사용처가 없으면 지우는걸로 한다.
+                    if (keypair2.Value != null)
+                        for (int i = 0; i < keypair2.Value.usageList.Count; i++)
+                        {
+                            if (keypair2.Value.usageList[i] == null)
+                            {
+                                keypair2.Value.usageList.RemoveAt(i);
+                                i--;
+                            }
+                        }
+                    if (keypair2.Value == null || keypair2.Value.usageList.Count == 0)
+                        removedMatList.Add(keypair2.Key);
+                }
+                foreach (var matData in removedMatList) keypair.Value.Remove(matData);
+                ListPool<MaterialData>.Release(removedMatList);
+
+                if (keypair.Value.Count == 0)
+                    removedOriginMatInstIDList.Add(keypair.Key);
+            }
+            foreach (var instID in removedOriginMatInstIDList) s_Materials.Remove(instID);
+            ListPool<int>.Release(removedOriginMatInstIDList);
         }
     }
 }
