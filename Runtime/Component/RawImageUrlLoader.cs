@@ -36,7 +36,7 @@ namespace UnityEngine.UI
 
                 if (Application.isPlaying == true)
                 {
-                    if (m_AutoLoad == true && m_RawImage.texture == null)
+                    if (m_AutoLoad == true && rawImage.texture == null)
                         Load();
                 }
             }
@@ -48,15 +48,22 @@ namespace UnityEngine.UI
         [SerializeField] private UnityEvent m_OnLoad = new UnityEvent();
         public UnityEvent onLoad => m_OnLoad;
 
+        private RawImage m_RawImage;
+        public RawImage rawImage
+        {
+            get
+            {
+                if (m_RawImage == null) m_RawImage = GetComponent<RawImage>();
+                return m_RawImage;
+            }
+        }
 
         private CanvasRenderer m_CanvasRenderer;
-        private RawImage m_RawImage;
         private Coroutine m_LoadRoutine;
 
         private void Awake()
         {
             m_CanvasRenderer = GetComponent<CanvasRenderer>();
-            m_RawImage = GetComponent<RawImage>();
         }
 
         private void OnEnable()
@@ -84,14 +91,15 @@ namespace UnityEngine.UI
             }
             else
             {
-                m_CanvasRenderer.SetAlpha(0f);
+                m_CanvasRenderer.SetAlpha(1f);
+                m_OnLoad.Invoke();
             }
         }
 
         private IEnumerator LoadRoutine(bool forceReload, string url, float fadeDuration)
         {
             m_CanvasRenderer.SetAlpha(0f);
-            m_RawImage.texture = null;
+            rawImage.texture = null;
 
             Texture2D loadedTexture = null;
             if (forceReload == false)
@@ -110,25 +118,31 @@ namespace UnityEngine.UI
                     else
                     {
                         loadedTexture = DownloadHandlerTexture.GetContent(request);
-                        m_RawImage.texture = loadedTexture;
+                        rawImage.texture = loadedTexture;
                         s_textureCache[url] = loadedTexture;
                         m_OnLoad.Invoke();
                     }
                 }
             }
 
-            m_RawImage.texture = loadedTexture;
-            m_OnLoad.Invoke();
+            rawImage.texture = loadedTexture;
 
-            if (m_RawImage.texture != null)
+            if (fadeDuration > 0f)
             {
+                m_CanvasRenderer.SetAlpha(0f);
+                m_OnLoad.Invoke();
+
                 var fadeStartTime = Time.realtimeSinceStartup;
                 while ((Time.realtimeSinceStartup - fadeStartTime) < fadeDuration)
                 {
                     m_CanvasRenderer.SetAlpha((Time.realtimeSinceStartup - fadeStartTime) / fadeDuration);
                     yield return null;
                 }
+            }
+            else
+            {
                 m_CanvasRenderer.SetAlpha(1f);
+                m_OnLoad.Invoke();
             }
         }
 
