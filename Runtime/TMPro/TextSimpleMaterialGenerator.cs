@@ -81,7 +81,7 @@ namespace TMPro
                 ResetMaterial();
                 m_GeneratedMaterialData = default;
                 m_PrevFontAsset = text.font;
-                originMaterial = text.fontSharedMaterial;
+                originMaterial = text.font.material;
             }
 
             UpdateMaterial();
