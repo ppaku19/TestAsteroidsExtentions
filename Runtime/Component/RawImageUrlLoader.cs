@@ -59,11 +59,19 @@ namespace UnityEngine.UI
         }
 
         private CanvasRenderer m_CanvasRenderer;
+        public CanvasRenderer canvasRenderer
+        {
+            get
+            {
+                if (m_CanvasRenderer == null) m_CanvasRenderer = GetComponent<CanvasRenderer>();
+                return m_CanvasRenderer;
+            }
+        }
+
         private Coroutine m_LoadRoutine;
 
         private void Awake()
         {
-            m_CanvasRenderer = GetComponent<CanvasRenderer>();
         }
 
         private void OnEnable()
@@ -91,14 +99,14 @@ namespace UnityEngine.UI
             }
             else
             {
-                m_CanvasRenderer.SetAlpha(1f);
+                canvasRenderer.SetAlpha(1f);
                 m_OnLoad.Invoke();
             }
         }
 
         private IEnumerator LoadRoutine(bool forceReload, string url, float fadeDuration)
         {
-            m_CanvasRenderer.SetAlpha(0f);
+            canvasRenderer.SetAlpha(0f);
             rawImage.texture = null;
 
             Texture2D loadedTexture = null;
@@ -129,19 +137,19 @@ namespace UnityEngine.UI
 
             if (fadeDuration > 0f)
             {
-                m_CanvasRenderer.SetAlpha(0f);
+                canvasRenderer.SetAlpha(0f);
                 m_OnLoad.Invoke();
 
                 var fadeStartTime = Time.realtimeSinceStartup;
                 while ((Time.realtimeSinceStartup - fadeStartTime) < fadeDuration)
                 {
-                    m_CanvasRenderer.SetAlpha((Time.realtimeSinceStartup - fadeStartTime) / fadeDuration);
+                    canvasRenderer.SetAlpha((Time.realtimeSinceStartup - fadeStartTime) / fadeDuration);
                     yield return null;
                 }
             }
             else
             {
-                m_CanvasRenderer.SetAlpha(1f);
+                canvasRenderer.SetAlpha(1f);
                 m_OnLoad.Invoke();
             }
         }
