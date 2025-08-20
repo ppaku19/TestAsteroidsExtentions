@@ -62,6 +62,11 @@ namespace UnityEngine.UI
             m_TMPText = GetComponent<TMPro.TMP_Text>();
         }
 
+        private void OnEnable()
+        {
+            UpdateText();
+        }
+
         public virtual void SetParameter(params object[] p)
         {
             _params = p;
@@ -72,6 +77,9 @@ namespace UnityEngine.UI
 
         protected virtual void UpdateText()
         {
+            if (isActiveAndEnabled == false)
+                return;
+
             string str = null;
             string formatStr = GetFormatString();
 
