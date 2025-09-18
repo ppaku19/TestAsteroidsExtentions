@@ -7,8 +7,26 @@ namespace PowerfulUI
 {
     public static class UIUtil
     {
-        public static Vector2 GetPoinsterPosition(int pointerID)
+        public static Vector2 GetPointerPosition(int pointerID)
         {
+#if ENABLE_INPUT_SYSTEM
+            if (pointerID == 0 || pointerID == 1 || pointerID == 2)
+            {
+                var mouse = UnityEngine.InputSystem.Mouse.current;
+                if (mouse != null)
+                    return mouse.position.ReadValue();
+            }
+
+            var screen = UnityEngine.InputSystem.Touchscreen.current;
+            if (screen != null)
+            {
+                foreach (var touch in screen.touches)
+                {
+                    if (touch.touchId.ReadValue() == pointerID)
+                        return touch.position.ReadValue();
+                }
+            }
+#endif
             switch (pointerID)
             {
                 case -1:
@@ -17,7 +35,7 @@ namespace PowerfulUI
                     return Input.mousePosition;
                 default:
                     {
-                        for (int i = 0; i < Input.touchCount; i ++)
+                        for (int i = 0; i < Input.touchCount; i++)
                         {
                             var touch = Input.touches[i];
                             if (touch.fingerId == pointerID)

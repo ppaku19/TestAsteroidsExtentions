@@ -80,7 +80,7 @@ namespace PowerfulUI
                     //드래그 체크
                     if (m_LongPressState == LongPressState.Ready || m_LongPressState == LongPressState.Begun)
                     {
-                        var currentPointerPosition = UIUtil.GetPoinsterPosition(m_LongPressPointerID);
+                        var currentPointerPosition = UIUtil.GetPointerPosition(m_LongPressPointerID);
                         var deltaSqr = (currentPointerPosition - m_LongPressStartPoint).sqrMagnitude;
                         var dragThreshold = EventSystem.current == null ? 0 : EventSystem.current.pixelDragThreshold;
                         if (deltaSqr >= (dragThreshold * dragThreshold))
