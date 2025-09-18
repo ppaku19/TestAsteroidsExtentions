@@ -34,6 +34,7 @@ namespace PowerfulUI
         
         protected SerializedProperty m_PowerfulUI_OnClickProperty;
         protected SerializedProperty m_PowerfulUI_EnableLongPressProperty;
+        protected SerializedProperty m_PowerfulUI_UseCustomLongPressReadyTimeProperty;
 
         // Whenever adding new SerializedProperties to the Selectable and SelectableEditor
         // Also update this guy in OnEnable. This makes the inherited classes from Selectable not require a CustomEditor.
@@ -64,6 +65,7 @@ namespace PowerfulUI
             
             m_PowerfulUI_OnClickProperty = serializedObject.FindProperty("m_OnClick");
             m_PowerfulUI_EnableLongPressProperty = serializedObject.FindProperty("m_EnableLongPress");
+            m_PowerfulUI_UseCustomLongPressReadyTimeProperty = serializedObject.FindProperty("m_UseCustomLongPressReadyTime");
 
             m_PropertyPathToExcludeForChildClasses.Add(m_PowerfulUI_ScriptProperty.propertyPath);
             m_PropertyPathToExcludeForChildClasses.Add(m_PowerfulUI_InteractableProperty.propertyPath);
@@ -79,6 +81,8 @@ namespace PowerfulUI
             m_PropertyPathToExcludeForChildClasses.Add(serializedObject.FindProperty("m_EnableEventOnDisabled").propertyPath);
             m_PropertyPathToExcludeForChildClasses.Add(serializedObject.FindProperty("m_OnBeginLongPress").propertyPath);
             m_PropertyPathToExcludeForChildClasses.Add(serializedObject.FindProperty("m_OnEndLongPress").propertyPath);
+            m_PropertyPathToExcludeForChildClasses.Add(m_PowerfulUI_UseCustomLongPressReadyTimeProperty.propertyPath);
+            m_PropertyPathToExcludeForChildClasses.Add(serializedObject.FindProperty("m_CustomLongPressReadyTime").propertyPath);
         }
 
         public override void OnInspectorGUI()
@@ -119,6 +123,13 @@ namespace PowerfulUI
                     EditorGUI.indentLevel ++;
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("m_OnBeginLongPress"));
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("m_OnEndLongPress"));
+                    EditorGUILayout.PropertyField(m_PowerfulUI_UseCustomLongPressReadyTimeProperty);
+                    if (m_PowerfulUI_UseCustomLongPressReadyTimeProperty.hasMultipleDifferentValues || m_PowerfulUI_UseCustomLongPressReadyTimeProperty.boolValue == true)
+                    {
+                        EditorGUI.indentLevel++;
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("m_CustomLongPressReadyTime"));
+                        EditorGUI.indentLevel--;
+                    }
                     EditorGUI.indentLevel --;
                 }
                 EditorGUI.indentLevel --;

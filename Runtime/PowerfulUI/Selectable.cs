@@ -30,6 +30,10 @@ namespace PowerfulUI
         public UnityEvent onBeginLongPress { get => m_OnBeginLongPress; set => m_OnBeginLongPress = value; }
         [FormerlySerializedAs("onEndLongPress")] [SerializeField] private UnityEvent m_OnEndLongPress = new UnityEvent();
         public UnityEvent onEndLongPress { get => m_OnEndLongPress; set => m_OnEndLongPress = value; }
+        [SerializeField] private bool m_UseCustomLongPressReadyTime = false;
+        public bool useCustomLongPressReadyTime { get => m_UseCustomLongPressReadyTime; set => UIUtil.SetStruct(ref m_UseCustomLongPressReadyTime, value); }
+        [SerializeField] private float m_CustomLongPressReadyTime = 1f;
+        public float customLongPressReadyTime { get => m_CustomLongPressReadyTime; set => UIUtil.SetStruct(ref m_CustomLongPressReadyTime, value); }
 
 
         private int m_LastTransitionState;
@@ -61,7 +65,7 @@ namespace PowerfulUI
                         return Time.realtimeSinceStartup - m_LongPressStartTime;
                     case LongPressState.Begun:
                     case LongPressState.Ended:
-                        return Time.realtimeSinceStartup - m_LongPressStartTime - LONGPRESS_READY_TIME;
+                        return Time.realtimeSinceStartup - m_LongPressStartTime - (useCustomLongPressReadyTime ? customLongPressReadyTime : LONGPRESS_READY_TIME);
                     default:
                         return 0f;
                 }
@@ -87,7 +91,7 @@ namespace PowerfulUI
                             EndLongPress();
                     }
                     
-                    if (m_LongPressState == LongPressState.Ready && (Time.realtimeSinceStartup - m_LongPressStartTime) >= LONGPRESS_READY_TIME)
+                    if (m_LongPressState == LongPressState.Ready && (Time.realtimeSinceStartup - m_LongPressStartTime) >= (useCustomLongPressReadyTime ? customLongPressReadyTime : LONGPRESS_READY_TIME))
                     {
                         m_LongPressState = LongPressState.Begun;
                         OnProcessBeginLongPress();
