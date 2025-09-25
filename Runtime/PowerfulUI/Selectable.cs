@@ -53,7 +53,7 @@ namespace PowerfulUI
         
         private int m_LongPressPointerID = 0;
         private float m_LongPressStartTime = 0f;
-        private Vector2 m_LongPressStartPoint = Vector2.zero;
+        private Vector2 m_LongPressStartScrollPosition = Vector2.zero;
 
         public float LongPressTime
         {
@@ -71,9 +71,18 @@ namespace PowerfulUI
                 }
             }
         }
+
+
+        private ScrollRect m_ParentScrollRect;
         
         
         protected Selectable() { }
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            m_ParentScrollRect = GetComponentInParent<ScrollRect>();
+        }
 
         protected virtual void Update()
         {
@@ -81,16 +90,16 @@ namespace PowerfulUI
             {
                 if (m_EnableLongPress == true)
                 {
-                    //드래그 체크
-                    if (m_LongPressState == LongPressState.Ready || m_LongPressState == LongPressState.Begun)
+                    //스크롤링 체크
+                    if (m_ParentScrollRect != null && (m_LongPressState == LongPressState.Ready || m_LongPressState == LongPressState.Begun))
                     {
-                        var currentPointerPosition = UIUtil.GetPointerPosition(m_LongPressPointerID);
-                        var deltaSqr = (currentPointerPosition - m_LongPressStartPoint).sqrMagnitude;
-                        var dragThreshold = EventSystem.current == null ? 0 : EventSystem.current.pixelDragThreshold;
-                        if (deltaSqr >= (dragThreshold * dragThreshold))
+                        var normalPosDiff = m_ParentScrollRect.normalizedPosition - m_LongPressStartScrollPosition;
+                        var contentSize = m_ParentScrollRect.content == null ? Vector2.zero : m_ParentScrollRect.content.sizeDelta;
+                        var dragThreshold = EventSystem.current.pixelDragThreshold;
+                        if ((Mathf.Abs(normalPosDiff.x) * contentSize.x) > dragThreshold || (Mathf.Abs(normalPosDiff.y) * contentSize.y) > dragThreshold)
                             EndLongPress();
                     }
-                    
+
                     if (m_LongPressState == LongPressState.Ready && (Time.realtimeSinceStartup - m_LongPressStartTime) >= (useCustomLongPressReadyTime ? customLongPressReadyTime : LONGPRESS_READY_TIME))
                     {
                         m_LongPressState = LongPressState.Begun;
@@ -137,7 +146,7 @@ namespace PowerfulUI
             
             m_LongPressPointerID = 0;
             m_LongPressStartTime = 0f;
-            m_LongPressStartPoint = Vector2.zero;
+            m_LongPressStartScrollPosition = Vector2.zero;
         }
 
         protected virtual void EndLongPress()
@@ -167,7 +176,7 @@ namespace PowerfulUI
                 m_LongPressState = LongPressState.Ready;
                 m_LongPressPointerID = eventData.pointerId;
                 m_LongPressStartTime = Time.realtimeSinceStartup;
-                m_LongPressStartPoint = eventData.position;
+                m_LongPressStartScrollPosition = m_ParentScrollRect == null ? Vector2.zero : m_ParentScrollRect.normalizedPosition;
                 OnProcessReadyLongPress();
             }
             
