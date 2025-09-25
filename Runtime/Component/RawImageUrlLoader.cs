@@ -10,6 +10,22 @@ namespace UnityEngine.UI
     [RequireComponent(typeof(RawImage))]
     public class RawImageUrlLoader : MonoBehaviour
     {
+        [SerializeField] private Texture2D m_EmptyTexture;
+        public Texture2D emptyTexture
+        {
+            get => m_EmptyTexture;
+            set
+            {
+                if (m_EmptyTexture == value)
+                    return;
+
+                m_EmptyTexture = value;
+                if (Application.isPlaying == true && isActiveAndEnabled == true && m_IsEmpty == true)
+                    rawImage.texture = m_EmptyTexture;
+            }
+        }
+
+
         [SerializeField] private string m_Url;
         public string url
         {
@@ -68,6 +84,7 @@ namespace UnityEngine.UI
             }
         }
 
+        private bool m_IsEmpty = true;
         private Coroutine m_LoadRoutine;
 
         private void Awake()
@@ -126,14 +143,14 @@ namespace UnityEngine.UI
                     else
                     {
                         loadedTexture = DownloadHandlerTexture.GetContent(request);
-                        rawImage.texture = loadedTexture;
                         s_textureCache[url] = loadedTexture;
                         m_OnLoad.Invoke();
                     }
                 }
             }
 
-            rawImage.texture = loadedTexture;
+            m_IsEmpty = loadedTexture == null;
+            rawImage.texture = m_IsEmpty ? m_EmptyTexture : loadedTexture;
 
             if (fadeDuration > 0f)
             {
