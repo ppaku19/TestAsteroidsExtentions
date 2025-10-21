@@ -19,6 +19,7 @@ namespace SimpleTween
 
         protected bool m_IsReverse = false;
         protected float m_Time = 0f;
+        protected int m_PlayFrameCount = 0;
 
         protected bool m_IsFinished = false;
         public bool isFinished => m_IsFinished;
@@ -42,6 +43,7 @@ namespace SimpleTween
             m_IsFinished = false;
             m_IsReverse = false;
             m_Time = 0f;
+            m_PlayFrameCount = 0;
             enabled = false;
             SetValue(0f);
         }
@@ -51,6 +53,7 @@ namespace SimpleTween
             m_IsFinished = false;
             m_IsReverse = true;
             m_Time = 0f;
+            m_PlayFrameCount = 0;
             enabled = false;
             SetValue(1f);
         }
@@ -130,7 +133,16 @@ namespace SimpleTween
 
         private void UpdateTime()
         {
-            m_Time += ignoreTimeScale ? Time.unscaledDeltaTime : Time.deltaTime;
+            if (Application.isPlaying == false && (ignoreTimeScale ? Time.unscaledDeltaTime : Time.deltaTime) > 0.1f) //deltatime이 0.1을 넘어간다면 이상한거다.
+            {
+                m_Time = 0f;
+            }
+            else
+            {
+                m_Time += ignoreTimeScale ? Time.unscaledDeltaTime : Time.deltaTime;
+            }
+
+            m_PlayFrameCount++;
         }
 
 
