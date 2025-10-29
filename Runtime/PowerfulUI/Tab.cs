@@ -126,7 +126,7 @@ namespace PowerfulUI
                     for (var i = 0; i < m_Offs.Length; i ++)
                     {
                         if (m_Offs[i] == null) continue;
-                        var graphics = m_Ons[i].GetComponentsInChildren<Graphic>(true);
+                        var graphics = m_Offs[i].GetComponentsInChildren<Graphic>(true);
                         foreach (var graphic in graphics)
                             if (list.Contains(graphic) == false)
                                 list.Add(graphic);
