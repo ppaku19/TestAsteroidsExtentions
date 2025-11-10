@@ -48,7 +48,7 @@ namespace SimpleTween
         public void Play()
         {
             Stop();
-            m_TweenIndex = 0;
+            m_TweenIndex = -1;
         }
 
         public void Stop()
@@ -61,7 +61,7 @@ namespace SimpleTween
         }
 
 
-        private int m_TweenIndex = 0;
+        private int m_TweenIndex = -1;
 
         private void UpdateTweens()
         {
@@ -70,18 +70,21 @@ namespace SimpleTween
 
             for (int i = m_TweenIndex; i < list.Count; i++)
             {
-                if (list[i] == null)
-                    continue;
-
-                if (list[i].enabled == false)
+                if (i >= 0)
                 {
-                    m_TweenIndex = i;
-                    list[i].enabled = true;
-                    return;
+                    if (list[i] == null)
+                        continue;
+
+                    if (list[i].enabled == true)
+                        break;
                 }
 
-                if (list[i].isFinished == false)
-                    return;
+                m_TweenIndex = i + 1;
+                if (m_TweenIndex >= list.Count)
+                    break;
+
+                list[m_TweenIndex].Play();
+                break;
             }
         }
     }

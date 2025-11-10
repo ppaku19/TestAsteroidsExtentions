@@ -21,9 +21,6 @@ namespace SimpleTween
         protected float m_Time = 0f;
         protected int m_PlayFrameCount = 0;
 
-        protected bool m_IsFinished = false;
-        public bool isFinished => m_IsFinished;
-
 
 
         public void Play()
@@ -40,7 +37,6 @@ namespace SimpleTween
 
         public void Stop()
         {
-            m_IsFinished = false;
             m_IsReverse = false;
             m_Time = 0f;
             m_PlayFrameCount = 0;
@@ -50,7 +46,6 @@ namespace SimpleTween
 
         public void StopReverse()
         {
-            m_IsFinished = false;
             m_IsReverse = true;
             m_Time = 0f;
             m_PlayFrameCount = 0;
@@ -125,7 +120,6 @@ namespace SimpleTween
             {
                 enabled = false;
                 onFinished.Invoke();
-                m_IsFinished = true;
             }
 
             UpdateTime();
