@@ -84,6 +84,12 @@ namespace PowerfulUI
             m_ParentScrollRect = GetComponentInParent<ScrollRect>();
         }
 
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            ResetLongPressState();
+        }
+
         protected virtual void Update()
         {
             if (Application.isPlaying == true)
